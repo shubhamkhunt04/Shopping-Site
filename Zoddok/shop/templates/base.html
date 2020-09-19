@@ -1,4 +1,6 @@
 {% load static %}
+{% load mptt_tags %}
+{% load env_extras %}
 <!DOCTYPE html>
 <html lang="zxx" class="no-js">
 <head>
@@ -6,18 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Favicon-->
     <link rel="shortcut icon" href="{% static 'img/fav.png' %}">
-    <!-- Author Meta -->
-    <meta name="author" content="CodePixar">
-    <!-- Meta Description -->
-    <meta name="description" content="">
-    <!-- Meta Keyword -->
-    <meta name="keywords" content="">
     <!-- meta character set -->
     <meta charset="UTF-8">
+    {% block meta_tags %}{% endblock %}
+    
+    
     <!-- Site Title -->
-    <title>Shop</title>
-    {% block css %}
-    {% endblock %}
+    <title>{% block title_tag %}{% endblock %}</title>
     
     <link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
@@ -25,113 +22,17 @@
         <!--
         CSS
         ============================================= -->
-        <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
-        <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">            
-        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/nice-select.cs' %}">
-        <link rel="stylesheet" href="{% static 'css/ion.rangeSlider.css' %}" />
-        <link rel="stylesheet" href="{% static 'css/ion.rangeSlider.skinFlat.css' %}" />
-        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-        <link rel="stylesheet" href="{% static 'css/main.css' %}">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <!--Custom css for all pages-->
-        <style>
-            .error{
-                color: red;
-            }
-            section.banner-area div.container{
-                padding:1%;
-            }
-            section.banner-area div.container a{
-                color:white;
-                text-decoration: none;
-                font-weight: 400;
-            }
-            .success-messages{
-                background-color:#2ecc71;margin-bottom: 2%;margin-top: -4%;
-            }
-            .success-messages span{
-                color:white;font-size:16px;font-weight: 400;margin:2%;
-            }
-            .account-form{
-                margin-bottom: 4%;
-            }
-            .account-form .login-form label{
-                color: black;
-                font-weight: 400;
-            }
-            .account-form .login-form .help-text{
-                color:#3498db;
-            }
-            .account-form .login-form .account-sub-title{
-                font-weight: 400;
-                font-size: 15px;
-            }
-            
-            .account-form .login-form .passtrengthMeter input{
-                border:none;
-                display: block;
-                width: 100%;
-                border: 1px solid #eee;
-                line-height: 40px;
-                padding: 0 30px;
-                margin-top: 10px;
-            }
-            
-            .passtrengthMeter .showPassword.active{
-                opacity: .5;
-            }
-
-            .passtrengthMeter .showPassword img{
-                display: block;
-                width: 100%;
-                height: auto;
-            }
-
-            .passtrengthMeter .showPassword:hover{
-                cursor: pointer;
-            }
-            .or-container {
-                align-items: center;
-                color: #ccc;
-                display: flex;
-                margin: 25px 0
-            }
-
-            .line-separator {
-                background-color: #ccc;
-                flex-grow: 5;
-                height: 1px
-            }
-
-            .or-label {
-                flex-grow: 1;
-                margin: 0 15px;
-                color:black;
-                font-weight: 400;
-                text-align: center
-            }
-            .btn-google{
-                background-image: -moz-linear-gradient(45deg, #f6463d 0%, #f6398d 45%, #f52cdc 100%);
-                background-image: -webkit-linear-gradient(45deg, #f6463d 0%, #f6398d 45%, #f52cdc 100%);
-                background-image: -ms-linear-gradient(45deg, #f6463d 0%, #f6398d 45%, #f52cdc 100%);
-                color:white;
-                padding:2%;
-                font-weight: 600;
-                font-size: 17px;
-                border:none;
-            }
-            .btn-google:hover{
-                color:white;
-            }
-            .btn-google img{
-                width: 8%;
-                background-color: white;
-                border-radius: 100%;
-                padding:1%;
-                margin-right: 3%;
-            }
-        </style>
+    <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">            
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/nice-select.cs' %}">
+    <link rel="stylesheet" href="{% static 'css/ion.rangeSlider.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/ion.rangeSlider.skinFlat.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    {% block custom_css_and_links %}
+    {% endblock %}
     </head>
     <body>
 
@@ -141,11 +42,12 @@
                 <div class="menu-top container">
                     <div class="d-flex justify-content-between align-items-center">
                         <ul class="list">
-                            <li><a href="tel:+919724408417">+91 97244 08417</a></li>
-                            <li><a href="mailto:zoddoks@gmail.com">zoddoks@gmail.com</a></li>                             
+                            <li><a href="tel:+919724408417">{% get_env_var 'CONTACT_NO' %}</a></li>
+                            <li><a href="mailto:zoddoks@gmail.com">{% get_env_var 'CONTACT_MAIL' %}</a></li>                             
                         </ul>
                         <ul class="list">
                             {% if user.is_authenticated %}
+                                <li><a href="{% url 'change-password' %}">Change Password</a></li>
                                 <li><a href="{% url 'logout' %}">logout</a></li>
                             {% else %}
                             <li><a href="{% url 'accounts' %}">Login</a></li>
@@ -154,10 +56,10 @@
                     </div>
                 </div>                  
             </div>
-            <nav class="navbar navbar-expand-lg navbar-light">
+            <nav class="navbar navbar-expand-lg  navbar-light">
                 <div class="container">
-                      <a class="navbar-brand" href="index.html">
-                        <img src="{% static 'img/logo.png' %}" alt="">
+                      <a class="navbar-brand" href="#">
+                          <img src="{% static 'img/logo.png' %}" alt="">
                       </a>
                       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -172,24 +74,19 @@
                                 <!-- Dropdown -->
                                 <li class="dropdown">
                                   <a class="dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                                    Pages
+                                    Category
                                   </a>
                                   <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="category.html">Category</a>
-                                    <a class="dropdown-item" href="single.html">Single</a>
-                                    <a class="dropdown-item" href="cart.html">Cart</a>
-                                    <a class="dropdown-item" href="checkout.html">Checkout</a>
-                                    <a class="dropdown-item" href="confermation.html">Confermation</a>
-                                    <a class="dropdown-item" href="login.html">Login</a>
-                                    <a class="dropdown-item" href="tracking.html">Tracking</a>
-                                    <a class="dropdown-item" href="generic.html">Generic</a>
-                                    <a class="dropdown-item" href="elements.html">Elements</a>
+                                    {% for node in category %}
+                                        <a class="dropdown-item" href="{{node.get_absolute_url}}">{{node.title}}</a>
+                                    {% endfor %}
                                   </div>
-                                </li>                                   
+                                </li>									
                         </ul>
-                      </div>                        
+                      </div>						
                 </div>
             </nav>
+           
         </header>
         <!-- End Header Area -->
 
@@ -260,9 +157,9 @@
                             <h6>Follow Us</h6>
                             <p>Let us be social</p>
                             <div class="footer-social d-flex align-items-center">
-                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="{% get_env_var 'FACEBOOK_AC' %}"><i class="fa fa-facebook"></i></a>
+                                <a href="{% get_env_var 'INSTA_AC' %}"><i class="fa fa-instagram"></i></a>
                                 <a href="#"><i class="fa fa-twitter"></i></a>
-                                <a href="#"><i class="fa fa-dribbble"></i></a>
                                 <a href="#"><i class="fa fa-behance"></i></a>
                             </div>
                         </div>

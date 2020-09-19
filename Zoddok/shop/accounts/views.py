@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from .forms import RegisterForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -20,13 +21,20 @@ from django.http import JsonResponse
 import django
 import gzip
 from pathlib import Path
-# Create your views here.
+from shop import custom_messages as Custom_Msg
+from products.views import get_categories
+import json
 
 #authentication and authorization views  ( login , register and activation views)
 UserModel = get_user_model()
 def accountView(request):
+    category=get_categories()
     form=RegisterForm()
-    return render(request,'accounts.html',{'form':form})
+    context={
+        'form':form,
+        'category':json.loads(category),
+    }
+    return render(request,'accounts.html',context=context)
 
 #customely validate email on onchange event of input using ajax and validate_email
 def validateEmail(request):
@@ -43,7 +51,7 @@ def validateEmail(request):
             data={
                 'status': 200,
                 'is_valid': False,
-                'error_msg': settings.INVALID_EMAIL_FRMT_ERR_MSG
+                'error_msg': Custom_Msg.INVALID_EMAIL_FRMT_ERR_MSG
             }
         return JsonResponse(data)
     else:
@@ -64,7 +72,7 @@ def validatePass(request):
             data={
                 'status': 200,
                 'is_valid': False,
-                'error_msg': settings.TO_SHORT_PASS_ERR_MSG
+                'error_msg': Custom_Msg.TO_SHORT_PASS_ERR_MSG
             }
         return JsonResponse(data)
     else:
@@ -84,7 +92,7 @@ def numericPass(request):
             data={
                 'status': 200,
                 'is_valid': False,
-                'error_msg': settings.ONLY_NUMERIC_PASS_ERR_MSG
+                'error_msg': Custom_Msg.ONLY_NUMERIC_PASS_ERR_MSG
             }
         return JsonResponse(data)
     else:
@@ -113,7 +121,7 @@ def commanPassCheck(request):
             data={
                 'status': 200,
                 'is_valid': False,
-                'error_msg': settings.TOO_COMMAN_PASS_ERR_MSG
+                'error_msg': Custom_Msg.TOO_COMMAN_PASS_ERR_MSG
             }
         else:
             data={
@@ -139,7 +147,7 @@ def comparePass(request):
             data={
                 'status': 200,
                 'is_valid': False,
-                'error_msg': settings.BOTH_PASS_NO_MATCH_ERR_MSG
+                'error_msg': Custom_Msg.BOTH_PASS_NO_MATCH_ERR_MSG
             }
         return JsonResponse(data)
     else:
@@ -148,6 +156,7 @@ def comparePass(request):
 
 #account activation view
 def activate(request, uidb64, token):
+    category=get_categories()
     form = RegisterForm()
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
@@ -157,71 +166,85 @@ def activate(request, uidb64, token):
     if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        messages.success(request,settings.ACC_EMAIL_VERIFIED)
-        return render(request,'accounts.html',{'form': form})
+        messages.success(request,Custom_Msg.ACC_EMAIL_VERIFIED)
+        return render(request,'accounts.html',{'form': form,'category':json.loads(category)})
     else:
-        return HttpResponse('Activation link is invalid!')
+        return redirect('invalid-url')
+
+
+
+def custom_mail(request,email_send_type,mail_subject,message,to_email,content_subtype=''):
+    if email_send_type == "Account Activation" or email_send_type == "forget password":
+        email = EmailMessage(
+            mail_subject, message,to=[to_email],
+        )
+        email.content_subtype=content_subtype
+        email.send()
+    elif email_send_type == "Login Code":
+        emailMsg = EmailMessage(
+            mail_subject, message,to=[to_email],
+        )
+        emailMsg.send()
+
 
 #register view
 def signup(request):
+    category=get_categories()
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False
             user.save()
-            raw_password = form.cleaned_data.get('password1')
+            #raw_password = form.cleaned_data.get('password1')
             current_site = get_current_site(request)
-            mail_subject = 'Activate your account.'
+            mail_subject = 'Activate your zoddok account'
             message = render_to_string('acc_active_email.html', {
                 'user': user,
                 'domain': current_site.domain,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': default_token_generator.make_token(user),
             })
-            
             to_email = form.cleaned_data.get('email')
-            email = EmailMessage(
-                mail_subject, message,to=to_email,
-            )
-            email.content_subtype="html"
-            email.send()
-            messages.success(request,settings.ACC_CONFIRMATION_EMAIL_SENT)
-            return render(request,'accounts.html',{'form': form})
+            custom_mail(request,"Account Activation",mail_subject,message,to_email,'html')
+            messages.success(request,Custom_Msg.ACC_CONFIRMATION_EMAIL_SENT)
+            return render(request,'accounts.html',{'form': form,'category':json.loads(category)})
     else:
         form = RegisterForm()
-    return render(request, 'accounts.html', {'form': form})
+    return render(request, 'accounts.html', {'form': form,'category':json.loads(category)})
 
 #login view
 def loginUser(request):
+    category=get_categories()
     form = RegisterForm()
-    if request.method == 'POST' and 'otplogin' in request.POST:
+    if request.method == 'POST' and 'otplogin' in request.POST or 'resendcode' in request.POST:
         if request.POST.get('email'):
             email=request.POST.get('email')
             try:
                 validate_email(email)
-                user_exsist_check=UserModel.objects.get(email=email)
-                mail_subject = 'Login OTP'
+                UserModel.objects.get(email=email)
+                mail_subject = 'Zoddok Account Login Code'
                 login_otp_generated = get_random_string(8, allowed_chars=string.ascii_uppercase + string.ascii_lowercase + string.digits)
-                message = "Use the login code "+login_otp_generated+' to login into your zoddok account. Login code can be valid till 10 mins.'
+                message = "Use the login code "+login_otp_generated+' to login into your zoddok account. Login code can be valid till 15 mins.'
                 to_email = email
-                emailMsg = EmailMessage(
-                    mail_subject, message,to=[to_email],
-                )
-                emailMsg.send()
+                custom_mail(request,"Login Code",mail_subject,message,to_email,'')
                 request.session['otp']=login_otp_generated
                 request.session['otpEmail']=to_email
                 request.session.modified = True
-                request.session.set_expiry(600)
-                return render(request,'accounts.html',{'form':form,'otp_send_mail':to_email})
+                request.session.set_expiry(900)
+                if 'resendcode' in request.POST:
+                    resendcode_sent=Custom_Msg.NEW_OTP_SUCC_SEND
+                    return render(request,'accounts.html',{'form':form,'otp_send_mail':to_email,'resend_code_sent':resendcode_sent,'category':json.loads(category)})
+                else:
+                    return render(request,'accounts.html',{'form':form,'otp_send_mail':to_email,'category':json.loads(category)})
             except ValidationError:
-                email_error=settings.INVALID_EMAIL_FRMT_ERR_MSG
-                return render(request,'accounts.html',{'email_error':email_error,'form':form})
+                email_error=Custom_Msg.INVALID_EMAIL_FRMT_ERR_MSG
+                return render(request,'accounts.html',{'email_error':email_error,'form':form,'category':json.loads(category)})
             except UserModel.DoesNotExist:
-                user_not_exsist=settings.USER_NOT_REGISTERED_ERR_MSG
-                return render(request,'accounts.html',{'user_not_exsist':user_not_exsist,'form':form})
+                user_not_exsist=Custom_Msg.USER_NOT_REGISTERED_ERR_MSG
+                return render(request,'accounts.html',{'user_not_exsist':user_not_exsist,'form':form,'category':json.loads(category)})
         else:
-            email_error=settings.FIELD_REQUIRE_ERR_MSG
+            email_error=Custom_Msg.FIELD_REQUIRE_ERR_MSG
             return render(request,'accounts.html',{'email_error':email_error,'form':form})
     if request.method == 'POST' and 'login' in request.POST:     
         if request.POST.get('email') and ( request.POST.get('otp') or request.POST.get('password') ):
@@ -230,61 +253,142 @@ def loginUser(request):
                 validate_email(email)
                 password=request.POST.get('password')
                 otp=request.POST.get('otp')
-                user_exsist_check=UserModel.objects.get(email=email)
+                UserModel.objects.get(email=email)
                 if otp is not None: 
                     if request.session.get('otpEmail') == email:
                         if request.session.get('otp') == otp:
                             user=UserModel.objects.get(email=email)
+                            if not request.POST.get('remember_me'):
+                                request.session.set_expiry(0)  # if remember me is 
+                                request.session.modified = True
                             login(request,user,backend=settings.AUTHENTICATION_BACKENDS[0])
                             return redirect('home')
                         else:
-                            password_or_otp_error=settings.INVALID_OTP_ERR_MSG
-                            return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error,'otp_send_mail':email})
+                            password_or_otp_error=Custom_Msg.INVALID_OTP_ERR_MSG
+                            return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error,'otp_send_mail':email,'category':json.loads(category)})
                     else:
-                        password_or_otp_error=settings.NO_OTP_SENT_ERR_MSG
-                        return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error})
+                        password_or_otp_error=Custom_Msg.NO_OTP_SENT_ERR_MSG
+                        return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error,'category':json.loads(category)})
                 if request.POST.get('password') is not None:
                     user=authenticate(email=email,password=password)
                     if user is not None:
                         login(request,user)
+                        if not request.POST.get('remember_me'):
+                                request.session.set_expiry(0)  # if remember me is 
+                                request.session.modified = True
                         if 'next' in request.GET:
                             return redirect(request.GET['next'])
                         else:
                             return redirect('home')
                     else:
-                        password_or_otp_error=settings.INVALID_CREDS_ERR_MSG
-                        return render(request,'accounts.html',{'password_or_otp_error':password_or_otp_error,'form':form})
+                        password_or_otp_error=Custom_Msg.INVALID_CREDS_ERR_MSG
+                        return render(request,'accounts.html',{'password_or_otp_error':password_or_otp_error,'form':form,'category':json.loads(category)})
             except ValidationError:
-                email_error=settings.INVALID_EMAIL_FRMT_ERR_MSG
-                return render(request,'accounts.html',{'email_error':email_error,'form':form})
+                email_error=Custom_Msg.INVALID_EMAIL_FRMT_ERR_MSG
+                return render(request,'accounts.html',{'email_error':email_error,'form':form,'category':json.loads(category)})
             except UserModel.DoesNotExist:
-                user_not_exsist=settings.USER_NOT_REGISTERED_ERR_MSG
-                return render(request,'accounts.html',{'user_not_exsist':user_not_exsist,'form':form})
+                user_not_exsist=Custom_Msg.USER_NOT_REGISTERED_ERR_MSG
+                return render(request,'accounts.html',{'user_not_exsist':user_not_exsist,'form':form,'category':json.loads(category)})
         else:
             email=request.POST.get('email')
             email_error=''
             password_or_otp_error=''
-
+            otp_send_mail=''
+            
             if email == '':
-                email_error=settings.FIELD_REQUIRE_ERR_MSG
+                email_error=Custom_Msg.FIELD_REQUIRE_ERR_MSG
             else:
                 try:
                     validate_email(email)
+                    if request.session.get('otpEmail') is not None and email == '':
+                        otp_send_mail=None
+                    elif request.session.get('otpEmail') is None and email is not None:
+                        otp_send_mail=None
+                    else:
+                        otp_send_mail=request.session.get('otpEmail')
                 except ValidationError:
-                    email_error=settings.INVALID_EMAIL_FRMT_ERR_MSG
+                    email_error=Custom_Msg.INVALID_EMAIL_FRMT_ERR_MSG
+        
             if request.POST.get('otp') is None or request.POST.get('password') is None:
-                password_or_otp_error=settings.FIELD_REQUIRE_ERR_MSG
-            if request.session.get('otpEmail') is not None and email == '':
-                otp_send_mail=None
-            elif request.session.get('otpEmail') is None and email is not None:
-                otp_send_mail=None
-            else:
-                otp_send_mail=request.session.get('otpEmail')
-            return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error,'email_error':email_error,'otp_send_mail':otp_send_mail})
+                password_or_otp_error=Custom_Msg.FIELD_REQUIRE_ERR_MSG
+           
+            return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error,'email_error':email_error,'otp_send_mail':otp_send_mail,'category':json.loads(category)})
     else:
-        return render(request,'accounts.html',{'form':form})
+        return render(request,'accounts.html',{'form':form,'category':json.loads(category)})
 
 #logout view
 def logoutUser(request):
     logout(request)
     return redirect('home')
+
+
+def forget_pass_view(request):
+    category=get_categories()
+    forget_pass_form = PasswordResetForm(request.POST)
+    if request.method == "POST":
+        if forget_pass_form.is_valid():
+            email=forget_pass_form.cleaned_data['email']
+            try:
+                validate_email(email)
+                check_user=UserModel.objects.get(email=email)
+                if check_user is not None:
+                    current_site = get_current_site(request)
+                    mail_subject = 'Forget password your zoddok account'
+                    message = render_to_string('forget_password_email.html', {
+                        'user': check_user,
+                        'domain': current_site.domain,
+                        'uid': urlsafe_base64_encode(force_bytes(check_user.pk)),
+                        'token': default_token_generator.make_token(check_user),
+                    })
+                    to_email = email
+                    custom_mail(request,"forget password",mail_subject,message,to_email,'html')
+                    messages.success(request,Custom_Msg.PASS_RESET_EMAIL_SENT)
+                    return redirect('accounts')
+            except ValidationError:
+                email_error=Custom_Msg.INVALID_EMAIL_FRMT_ERR_MSG
+                return render(request,'forget_password.html',{'email_error':email_error,'form':forget_pass_form,'category':json.loads(category)})
+            except UserModel.DoesNotExist:
+                user_not_exsist=Custom_Msg.USER_NOT_REGISTERED_ERR_MSG
+                return render(request,'forget_password.html',{'user_not_exsist':user_not_exsist,'form':forget_pass_form,'category':json.loads(category)})
+
+    return render(request,'forget_password.html',{'form':forget_pass_form,'category':json.loads(category)})
+
+
+def forget_pass_comfirm_view(request, uidb64, token):
+    category=get_categories()
+    if request.method == "GET":
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            UserModel.objects.get(pk=uid)
+            user = UserModel._default_manager.get(pk=uid)
+            pass_confirm=SetPasswordForm(user=user)
+        except(TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+            user = None
+            return redirect('invalid-url')
+    if request.method == "POST":
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            UserModel.objects.get(pk=uid)
+            user = UserModel._default_manager.get(pk=uid)
+            pass_confirm=SetPasswordForm(user=user,data=request.POST)
+            if pass_confirm.is_valid():
+                pass_confirm.save()
+                messages.success(request,Custom_Msg.PASS_RESET_SUCC)
+                return redirect('accounts')
+        except(TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+            user = None
+            return redirect('invalid-url')
+    return render(request,'forget_password_confirm.html',{'form':pass_confirm,'category':json.loads(category)})
+
+
+@login_required
+def change_password(request):
+    category=get_categories()
+    form=PasswordChangeForm(request.user)
+    if request.method == "POST":
+        form=PasswordChangeForm(request.user,data=request.POST)
+        if form.is_valid():
+            form.save()
+            login(request,request.user)
+            return redirect('home')
+    return render(request,'change_password.html',{'form':form,'category':json.loads(category)})

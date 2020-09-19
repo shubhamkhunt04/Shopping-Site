@@ -14,9 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include, re_path
 from . import views
 from accounts import views as accountViews
+from django.contrib.auth import views as auth_views #import this
+from products import views as productViews
+from . import settings
+from django.conf.urls.static import static
+from django.conf.urls import url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +36,14 @@ urlpatterns = [
     path('numericPass/',accountViews.numericPass,name='numericPass',),
     path('comparePass/',accountViews.comparePass,name='comparePass',),
     path('commanPass/',accountViews.commanPassCheck,name='commanPass',),
+    path('accounts/forget-password/',accountViews.forget_pass_view,name='forget-password'),
+    path('accounts/forget-password-confirm/<uidb64>/<token>/',accountViews.forget_pass_comfirm_view, name='forget-password-confirm'),
+    path('accounts/change-password/',accountViews.change_password,name='change-password'),
+    path('invalid-url/',views.invalid_url_view,name='invalid-url'),
+    re_path(r'^category/(?P<slug>.*)/$',productViews.category,name='category'),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('product/<int:id>/<slug:slug>',productViews.product_detail,name="product-details"),
 ]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

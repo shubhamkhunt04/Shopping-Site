@@ -1,0 +1,28 @@
+Step 1-	install latest python on your computer and add path to encviorment variable
+	sample path -  C:\Users\username\AppData\Local\Programs\Python\Python38
+
+Step 2-	then set a new enviorment path to use pip
+	C:\Users\username\AppData\Local\Programs\Python\Python38\Scripts
+
+
+Step 3 -	now use pip to install some packages and django
+	pip install django
+	
+
+Step 4 -	Open Xampp
+	start apache and mysql
+
+Step 5 -	Open Visual Studio Code Editer 
+	add live server extension in visual studio editor(left side bar ma upper side explorer,search ma last opetion extension)
+	Go to file -> open folder
+	now select this Zoddok folder
+	after opening folder find .env file in Zoddok->shop
+	in .env file set email id and its password so using that mail account verification email will be sent to user
+	now go to view -> Terminal
+	On termial run commands
+	1.pip install -r requirements.txt	
+	2.cd shop
+	3.python manage.py makemigrations
+	4.python manage.py migrate	//step 2 3 commands not nedded every time first time to make database and tables
+	5.python manage.py runserver(copy link from terminal and paste on browser)
+	

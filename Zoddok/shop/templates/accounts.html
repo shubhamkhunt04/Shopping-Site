@@ -1,11 +1,42 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+
+{% block meta_tags %}
+    <!-- Author Meta -->
+    <meta name="author" content="">
+    <!-- Meta Description -->
+    <meta name="description" content="">
+    <!-- Meta Keyword -->
+    <meta name="keywords" content="">
+{% endblock %}
+
+{% block title_tag %}Accounts{% endblock %}
+
+{% block custom_css_and_links %}
+  <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+  <style>
+    .showPassword{
+      margin-top:6px;
+    }
+    .error,.success{
+      font-size:15px;
+    }
+    .success{
+      color:green;
+    }
+  </style>
+{% endblock %}
+
 {% block breadcrum %}
 <section class="banner-area organic-breadcrumb">
-  <div class="container mr-auto">
-        <a href="{% url 'home'%}">Home&nbsp;&nbsp;<i class="fa fa-caret-right" aria-hidden="true"></i>&nbsp;</a>
-        <a href="{% url 'accounts'%}">Accounts</a>
+  <div class="container">
+      <div class="breadcrumb-banner d-flex flex-wrap align-items-center">
+          <div class="col-lg-12 col-xs-12 col-first col-sm-12 d-flex flex-wrap align-items-center">
+              <a href="{% url 'home'%}">Home&nbsp;&nbsp;<i class="fa fa-caret-right" aria-hidden="true"></i>&nbsp;</a>
+              <a href="{% url 'accounts'%}">Accounts</a>
+          </div>
+      </div>
   </div>
 </section>
 {% endblock %}
@@ -34,8 +65,9 @@
           {% if otp_send_mail %}
             {{otp_send_mail}} <a href="{% url 'accounts'%}">Change Email</a>
             <input type="hidden" id="email" name="email" value="{{otp_send_mail}}" required class="common-input mt-20">
+            <br/>
           {% else %}
-            <input type="email" id="email" name="email" onchange="validate_mail()" placeholder="Enter your email*" onfocus="this.placeholder=''" onblur="this.placeholder = 'Enter your email*'" required class="common-input mt-20">
+            <input type="email" id="email" name="email" placeholder="Enter your email*" onfocus="this.placeholder=''" onblur="this.placeholder = 'Enter your email*'" required class="common-input mt-20">
           {% endif %}
           <span class="error" id="email_error">
             {% if email_error %}
@@ -49,12 +81,18 @@
           {% if otp_send_mail %}
           {% else %}
           <label for="password">Password <span class="error">*</span></label>
-          <input type="password" id="password" name="password" placeholder="Enter your password*" onfocus="this.placeholder=''" onblur="this.placeholder = 'Enter your password*'"  class="common-input mt-20">
+          <div class="passtrengthMeter login_pass">
+            <input type="password" id="password" name="password" placeholder="Enter your password*" onfocus="this.placeholder=''" onblur="this.placeholder = 'Enter your password*'"  class="common-input mt-20">
+            <a href=""><span class="showPassword">
+              <img src="{% static '/img/eye.svg' %}">
+            </span></a>
+          </div>
           {% endif %}
           {% if otp_send_mail %}
           <label for="otp">Login Code <span class="error">*</span></label>
           <input type="text" id="otp" name="otp" placeholder="Enter your Login code*" onfocus="this.placeholder=''" onblur="this.placeholder = 'Enter your Login code*'"  class="common-input mt-20">
-          <p class="help-text">Login code wich have been sent on your given email address.</p>
+          <span class="help-text">Login code wich have been sent on your given email address.</span>
+          <br/>
           {% endif %}
           <span class="error">
             {% if password_or_otp_error %}
@@ -64,33 +102,43 @@
               {{invalid_creds_error}}
             {% endif %}
           </span>
+          <span class="success">
+            {% if resend_code_sent %}
+              <i class="fa fa-check-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;{{resend_code_sent}}
+            {% endif %}
+          </span>
           <br/><br/>
-          <button class="view-btn color-2 mt-20 w-100" name='login' value="login"><span>Login</span></button>
+          <button class="view-btn color-2 mt-20 w-100" name='login' value="login">
+              <span>Login
+                {% if otp_send_mail %}
+                  With Login Code
+                {% else %}
+                  With Password
+                {% endif %}
+              </span>
+          </button>
           {% if otp_send_mail %}
+             <button class="view-btn color-2 mt-20 w-100" name='resendcode' value="resendcode"><span>Resend Login Code</span></button>
+             <div class="or-container">
+              <div class="line-separator"></div>
+              <div class="or-label">or</div>
+              <div class="line-separator"></div>
+            </div>
+            <a href="{% url 'accounts' %}" class="view-btn color-2 mt-20 w-100" name='resendcode' value="loginwithpass"><span>Login with password</span></a>
           {% else %}
-          <button class="view-btn color-2 mt-20 w-100" name='otplogin' value="otplogin"><span>Request Login Code</span></button>
-          {% endif %}
+          <button class="view-btn color-2 mt-20 w-100" name='otplogin' value="otplogin"><span>Get Login Code On Your Mail</span></button>
           <div class="mt-20 d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center"><input type="checkbox" class="pixel-checkbox" id="login-1">
-            <label for="login-1">Remember me</label></div>
-            <a href="#">Lost your password?</a>
+            <div class="d-flex align-items-center"><input type="checkbox" class="pixel-checkbox" id="remember_me" name="remember_me">
+            <label for="login-1">Keep me logged in.</label></div>
+            <a href="{% url 'forget-password' %}">Forget your password?</a>
           </div>
-          
+          {% endif %}
         </form>
       </div>
     </div>
     <div class="col-md-6">
       <div class="login-form">
         <h3 class="billing-title text-center">Register</h3>
-        <form method="POST" action="#">
-          {% csrf_token %}
-          <button class="btn btn-block btn-social btn-google mt-20 pt-10 pb-10"><img src="../static/img/google_logo.png" class="img img-responsive"/>Register using google</button>
-        </form>
-        <div class="or-container">
-          <div class="line-separator"></div>
-          <div class="or-label">or</div>
-          <div class="line-separator"></div>
-      </div>
         <p class="text-center mt-40 mb-30 account-sub-title">Create your very own account </p>
         <form action="{% url 'signup' %}" method="POST">  
           {% csrf_token %}
@@ -136,186 +184,11 @@
 
 
 {% block scripts %}
+<script src="{% static 'js/accounts.js' %}"></script> 
 <script>
-  //email validation onchange for login form
-  function validate_mail(){
-    $.ajax({
-    type: "POST",
-    url: "{% url 'validateEmail' %}",
-    data:{
-      'csrfmiddlewaretoken': '{{ csrf_token }}',
-      'email_id':document.getElementById('email').value
-    },
-    dataType: 'json',
-    beforeSend: function() {
-      
-    },
-    success: function(data){
-      if(data.is_valid)
-      {
-        $('#email_error').html('');
-      }
-      else{
-        $('#email_error').html(data.error_msg);
-      }
-    }
-    });
-  }
-
-//email validation onchane for register form
-  $(function(){
-    $("#id_email").on('change', function(){
-      $.ajax({
-        type: "POST",
-        url: "{% url 'validateEmail' %}",
-        data:{
-          'csrfmiddlewaretoken': '{{ csrf_token }}',
-          'email_id':document.getElementById('id_email').value
-        },
-        dataType: 'json',
-        beforeSend: function() {
-          
-        },
-        success: function(data){
-          if(data.is_valid)
-          {
-            $('#reg_email_error').html('');
-          }
-          else{
-            $('#reg_email_error').html(data.error_msg);
-          }
-        }
-      });
-    })
-  });
-  
-  //function to check all errors and replace same error to avoid printing same errors on webpage
-  function get_all_errors(className,idName,data){
-    var spans = document.getElementsByClassName(className);
-    results=[];
-    if(!spans){
-      $(idName).html(data.error_msg);
-    }
-    else{
-      error_exsist=0;
-      for(var i = 0; i < spans.length; i++){
-        if(spans[i].innerHTML==data.error_msg)
-          error_exsist=error_exsist+1;
-      }
-      if(error_exsist==0){
-        data.error_msg=data.error_msg+"<br/>";
-        $(idName).html(data.error_msg);
-      }
-      else
-        $(idName).html('');
-    }
-  }
-  //main password error for register form
-  $(function(){
-    $("#id_password1").on('change', function(){
-      $.ajax({
-        type: "POST",
-        url: "{% url 'validatePass' %}",
-        data:{
-          'csrfmiddlewaretoken': '{{ csrf_token }}',
-          'password':document.getElementById('id_password1').value
-        },
-        dataType: 'json',
-        beforeSend: function() {
-        },
-        success: function(data){
-          if(data.is_valid)
-          {
-            $('#pass_error').html('');
-          }
-          else{
-            get_all_errors('error','#pass_error',data);
-          }
-        }
-      });
-    })
-  });
-
-  //check password is entirely numeric or not
-  $(function(){
-    $("#id_password1").on('change', function(){
-      $.ajax({
-        type: "POST",
-        url: "{% url 'numericPass' %}",
-        data:{
-          'csrfmiddlewaretoken': '{{ csrf_token }}',
-          'password':document.getElementById('id_password1').value
-        },
-        dataType: 'json',
-        beforeSend: function() {
-        },
-        success: function(data){
-          if(data.is_valid)
-          {
-            $('#numeric_pass_error').html('');
-          }
-          else{
-            get_all_errors('error','#numeric_pass_error',data);
-          }
-        }
-      });
-    })
-  });
-
-   //check password is comman or not
-   $(function(){
-    $("#id_password1").on('change', function(){
-      $.ajax({
-        type: "POST",
-        url: "{% url 'commanPass' %}",
-        data:{
-          'csrfmiddlewaretoken': '{{ csrf_token }}',
-          'password':document.getElementById('id_password1').value
-        },
-        dataType: 'json',
-        beforeSend: function() {
-        },
-        success: function(data){
-          if(data.is_valid)
-          {
-            $('#comman_pass_error').html('');
-          }
-          else{
-            get_all_errors('error','#comman_pass_error',data);
-          }
-        }
-      });
-    })
-  });
-
-  //re-password compare with main password for register form
-  $(function(){
-    $("#id_password2").on('change', function(){
-      $.ajax({
-        type: "POST",
-        url: "{% url 'comparePass' %}",
-        data:{
-          'csrfmiddlewaretoken': '{{ csrf_token }}',
-          'password1':document.getElementById('id_password1').value,
-          'password2':document.getElementById('id_password2').value
-        },
-        dataType: 'json',
-        beforeSend: function() {
-          
-        },
-        success: function(data){
-          if(data.is_valid)
-          {
-            $('#confirm_pass_error').html('');
-          }
-          else{
-            get_all_errors('error','#confirm_pass_error',data);
-          }
-        }
-      });
-    })
-  });
-
+  validate_email("#email","#email_error");//login email
+  validate_email("#id_email","#reg_email_error");//registration email
+  password_check("#id_password1","#id_password2");// all email
   //pass show and strength pulgin
   $(document).ready(function($) {
     $('#id_password1').passtrength({
@@ -324,29 +197,14 @@
       tooltip: true,
     });
   });
-
-  //show password toggle function
-  function showPass_func(className,idName){
-    var classDot=".";
-    var className=classDot.concat(className," ","a");
-    var icon_class=className.concat(" ",".showPassword");
-    $(className).on('click', function(event) {
-      event.preventDefault();
-      if($(idName).attr("type") == "text"){
-          $(idName).attr('type', 'password');
-          $(icon_class).removeClass('active');
-      }else if($(idName).attr("type") == "password"){
-          $(icon_class).addClass('active');
-          $(idName).attr('type', 'text');
-      }
-    });
-  }
   $(document).ready(function() {
     showPass_func('re_pass',"#id_password2");
   });
   $(document).ready(function() {
     showPass_func('pass',"#id_password1");
   });
-
+  $(document).ready(function() {
+    showPass_func('login_pass',"#password");
+  });
 </script>
 {% endblock %}
