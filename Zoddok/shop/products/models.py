@@ -41,7 +41,20 @@ class Category(MPTTModel):
         return self.title
     
     def get_absolute_url(self):
-        return reverse('category', kwargs={'slug': self.slug})
+        slugs=''
+        try:
+            ancestors = self.get_ancestors(include_self=True)
+        except:
+            ancestors = []
+        else:
+            ancestors = [ i.slug for i in ancestors]
+            for i in range(len(ancestors)):
+                if i==0:
+                    slugs+=ancestors[i]
+                else:
+                    slugs+='/'
+                    slugs+=ancestors[i]
+            return reverse('category', kwargs={'slug': slugs})
 
     def image_tag(self):
         if self.image.url is not None:
@@ -109,7 +122,7 @@ class Product(models.Model):
             return ""
 
     def get_absolute_url(self):
-        return reverse('category_detail', kwargs={'slug': self.slug})
+        return reverse('product', kwargs={'slug': self.slug})
 
 class Images(models.Model):
     product=models.ForeignKey(Product,on_delete=models.CASCADE)

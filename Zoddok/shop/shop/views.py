@@ -14,8 +14,8 @@ def home(request):
 
 #invalid url page view
 def invalid_url_view(request):
-    jsonTree=get_categories
+    jsonTree=get_categories()
     context={
         'category':json.loads(jsonTree),
     }
-    return render(request,'invalid_url.html',content=context)
+    return render(request,'invalid_url.html',context=context)

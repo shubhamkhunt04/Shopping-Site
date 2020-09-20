@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from .models import Category, Color, Product, Variants, Size, Images, SocialLinks
+from django.shortcuts import render, redirect
+from .models import Category,Color,Product,Variants,Size,Images,SocialLinks
 from mptt.templatetags.mptt_tags import cache_tree_children
 import json
 from django.template.loader import render_to_string
@@ -30,8 +30,11 @@ def product_detail(request,id,slug):
     menu_category=get_categories()
     query = request.GET.get('q')
     
+    try:
+        product = Product.objects.get(pk=id)
+    except:
+        return redirect('invalid-url')
 
-    product = Product.objects.get(pk=id)
     category = Category.objects.get(pk=product.category_id)
     category=Category.objects.get(pk=category.id).get_ancestors()
     images = Images.objects.filter(product_id=id)
@@ -58,9 +61,29 @@ def product_detail(request,id,slug):
     return render(request,'product_details.html',context)
 
 
+
+
+def get_node_from_slug(node):
+    for rs in Category.objects.all():
+        if rs.slug == node:
+            return rs
+
 def category(request,slug):
     slug=slug.split('/')
-    sitemap=slug
+    sitemap=[]
+    
+    found=0
+    for rs in slug:
+        check_cat=Category.objects._mptt_filter(slug=rs)
+        if check_cat:
+            found+=1
+
+    if found < len(slug):
+        return redirect('invalid-url')
+        
+    for rs in slug:
+        sitemap.append(get_node_from_slug(rs))
+    
     if len(slug)>1:
         slug=slug[-1]
     else:
