@@ -6,9 +6,9 @@
     <!-- Author Meta -->
     <meta name="author" content="">
     <!-- Meta Description -->
-    <meta name="description" content="">
+    <meta name="description" content="{{product.meta_description}}">
     <!-- Meta Keyword -->
-    <meta name="keywords" content="">
+    <meta name="keywords" content="{{product.meta_keywords}}">
 {% endblock %}
 
 {% block title_tag %}{{ product.title }}{% endblock %}
@@ -24,10 +24,10 @@
             <div class="col-lg-12 col-xs-12 col-first col-sm-12 d-flex flex-wrap align-items-center">
                 <a href="{% url 'home'%}">Home&nbsp;&nbsp;<i class="fa fa-caret-right" aria-hidden="true"></i>&nbsp;</a>
                 {% for c in product_category %}
-                    <a href="/category/{{c.slug}}/">{{ c.title }}&nbsp;&nbsp;<i class="fa fa-caret-right" aria-hidden="true"></i>&nbsp;</a>
+                    <a href="{{c.get_absolute_url}}">{{ c.title | truncatechars:10 }}&nbsp;&nbsp;<i class="fa fa-caret-right" aria-hidden="true"></i>&nbsp;</a>
                 {% endfor %}
-                <a href="/{{prduct.category.slug}}">{{ product.category.title }}&nbsp;&nbsp;<i class="fa fa-caret-right" aria-hidden="true"></i>&nbsp;</a>
-                <a href="/product/{{product.id}}/{{product.slug}}">{{product.title}}</a>
+                <a href="{{prduct.category.get_absolute_url}}">{{ product.category.title }}&nbsp;&nbsp;<i class="fa fa-caret-right" aria-hidden="true"></i>&nbsp;</a>
+                <a href="/product/{{product.id}}/{{product.slug}}">{{ product.title | truncatechars:15 }}</a>
             </div>
         </div>
     </div>
@@ -53,11 +53,12 @@
                 <div class="quick-view-content">
                     <div class="top">
                         <h3 class="head" style="font-weight: 700;font-size: xx-large;">{{ product.title }}</h3>
-                        <div class="price d-flex align-items-center"><span class="lnr lnr-tag"></span> <span class="ml-10"><i class="fa fa-inr" aria-hidden="true"></i>{{ product.price }}</span></div>
+                        <div class="price d-flex align-items-center" style="font-size: larger;">Price Starts From&nbsp;&nbsp;-&nbsp;&nbsp;<span class="lnr lnr-tag"></span><span class="ml-10"><i class="fa fa-inr" aria-hidden="true"></i>{{ product.price }}</span></div>
                         <div class="category" style="font-weight: 500;font-size: medium;"><strong>Category</strong> : <span>{{ product.category.title }}</span></div>
                         <div class="available" style="font-weight: 500;font-size: medium;"><strong>Availibility</strong> : {% if product.stocks == 'In-Stock' %}<span class="text-success">In Stock</span>{% else %}<span class="text-warning">Out of Stock</span>{% endif %}</span></div>
                     </div>
                     <div class="middle">
+                        {{product.category}}
                         <p class="content">{{ product.description }}</p>
                     </div>
                     <div class="product-btns">
@@ -65,7 +66,8 @@
                                 <p class="mt-10" style="font-size: medium;font-weight: 600;">Available In Sizes</p>
                                 <div class="row">
                                     {% for rs in sizes %}
-                                        <div class="col-md-4 col-sm-4 col-xs-4 col-4"><strong>{{ rs.size.name }}[{{ rs.size.code }}]</strong></div>
+                                        <div class="col-md-4 col-sm-4 col-xs-4 col-4"><strong>{{ rs.size.name }}[{{ rs.size.code }}]</strong>
+                                        </div>
                                     {% endfor %}
                                 </div>
                                 <p class="mt-20 mb-0 available_title" style="font-size: medium;font-weight: 600;">Available In Colors</p>
@@ -78,7 +80,8 @@
                                 <p class="mt-10 available_title" style="font-size: medium;font-weight: 600;">Available In Sizes</p>
                                 <div class="row">
                                     {% for rs in sizes %}
-                                        <div class="col-md-4 col-sm-4 col-xs-4 col-4"><strong>{{ rs.size.name }} - {{ rs.size.code }}</strong></div>
+                                        <div class="col-md-4 col-sm-4 col-xs-4 col-4"><strong>{{ rs.size.name }}[{{ rs.size.code }}]</strong>
+                                        </div>    
                                     {% endfor %}
                                 </div>
                             {% elif product.variant == 'Color' %}
@@ -94,10 +97,14 @@
                         {% for rs in sociallinks %}
                             <form action="{{rs.link}}" class="container">
                                 {% if rs.name == 'Flipkart' %}
-                                    <button class="btn btn-primary btn-block text-center">Buy From Flipkart&nbsp;&nbsp;<img src="/media/img/flipkart.png" style="width:50px;margin-top: -5px;"></button>
+                                    <button class="btn btn-primary btn-block text-center">Buy From Flipkart&nbsp;&nbsp;<img src="/media/img/flipkart.png" style="width:50px;margin-top: -5px;">
+                                    &nbsp;&nbsp;|&nbsp;&nbsp;At Price&nbsp;&nbsp;<i class="fa fa-inr" aria-hidden="true"></i>{{rs.price}}
+                                    </button>
                                 {% endif %}
                                 {% if rs.name == 'Amazon' %}
-                                    <button class="btn btn-block text-center mt-10">Buy From Amazon&nbsp;&nbsp;<i class="fa fa-amazon" aria-hidden="true" style="font-size: 28px;"></i></button>
+                                    <button class="btn btn-block text-center mt-10">Buy From Amazon&nbsp;&nbsp;<i class="fa fa-amazon" aria-hidden="true" style="font-size: 28px;"></i>
+                                    &nbsp;&nbsp;|&nbsp;&nbsp;At Price&nbsp;&nbsp;<i class="fa fa-inr" aria-hidden="true"></i>{{rs.price}}
+                                    </button>
                                 {% endif %}
                             </form>
                         {% endfor %}

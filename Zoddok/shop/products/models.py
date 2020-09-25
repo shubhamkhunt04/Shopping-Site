@@ -4,6 +4,7 @@ import mptt
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from ckeditor_uploader.fields import RichTextUploadingField
+from mptt.templatetags.mptt_tags import cache_tree_children
 
 class Category(MPTTModel):
     STATUS=(
@@ -12,6 +13,8 @@ class Category(MPTTModel):
     )
     title = models.CharField(max_length=50)
     description=models.CharField(max_length=255,unique=True)
+    meta_description=models.TextField(null=True,blank=True)
+    meta_keywords=models.TextField(null=True,blank=True)
     status=models.CharField(max_length=10,choices=STATUS)
     image=models.ImageField(blank=True,upload_to='img/')
     create_at=models.DateTimeField(auto_now_add=True)
@@ -40,6 +43,18 @@ class Category(MPTTModel):
     def __str__(self):
         return self.title
     
+    def get_child_count(self):
+        if self._mpttfield('right') is None:
+            return 0
+        else:
+            childs=self.get_children()
+            count=0
+            for n in childs:
+                count+=1
+            return count
+            #return ( self._mpttfield('right') - self._mpttfield('left') - 1 ) // 2 
+
+
     def get_absolute_url(self):
         slugs=''
         try:
@@ -100,6 +115,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE) #many to one relation with Category
     title = models.CharField(max_length=150)
     #keywords = models.CharField(max_length=255)
+    meta_description=models.TextField(null=True,blank=True)
+    meta_keywords=models.TextField(null=True,blank=True)
     description = models.TextField()
     image=models.ImageField(upload_to='img/',null=False)
     price = models.DecimalField(max_digits=12, decimal_places=2,default=0)
@@ -163,6 +180,7 @@ class SocialLinks(models.Model):
     product=models.ForeignKey(Product,on_delete=models.CASCADE)
     name=models.CharField(max_length=50)
     link=models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=12, decimal_places=2,default=0)
 
     def __str__(self):
         return self.name

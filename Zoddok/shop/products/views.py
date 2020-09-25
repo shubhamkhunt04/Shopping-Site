@@ -8,6 +8,7 @@ from mptt.templatetags.mptt_tags import cache_tree_children
 import json
 from django.shortcuts import get_object_or_404
 import string 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 # Create your views here.
@@ -27,7 +28,6 @@ def recursive_node_to_dict(node):
     return obj
 
 def product_detail(request,id,slug):
-    menu_category=get_categories()
     query = request.GET.get('q')
     
     try:
@@ -40,7 +40,7 @@ def product_detail(request,id,slug):
     images = Images.objects.filter(product_id=id)
     social_links=SocialLinks.objects.filter(product_id=id)
     context = {'product': product,'product_category': category,
-               'images': images,'sociallinks':social_links,'category':json.loads(menu_category),
+               'images': images,'sociallinks':social_links,
                }
     if product.variant !="None": # Product have variants
         if request.method == 'POST': #if we select color
@@ -72,6 +72,8 @@ def category(request,slug):
     slug=slug.split('/')
     sitemap=[]
     
+    page = request.GET.get('page', 1)
+
     found=0
     for rs in slug:
         check_cat=Category.objects._mptt_filter(slug=rs)
@@ -96,6 +98,14 @@ def category(request,slug):
     data_sended=''
     if category.get_descendants():
         sub_categories = cache_tree_children(category.get_descendants())
+        paginator = Paginator(sub_categories, 15)
+        try:
+            sub_categories = paginator.page(page)
+        except PageNotAnInteger:
+            sub_categories = paginator.page(1)
+        except EmptyPage:
+            sub_categories = paginator.page(paginator.num_pages)
+
         data_sended='Category'
     else:
         category=category.get()
@@ -104,9 +114,16 @@ def category(request,slug):
                 category = rs
                 break
         product_list=Product.objects.filter(category_id=category.id)
+        paginator = Paginator(product_list, 15)
+        try:
+            product_list = paginator.page(page)
+        except PageNotAnInteger:
+            product_list = paginator.page(1)
+        except EmptyPage:
+            product_list = paginator.page(paginator.num_pages)
         data_sended='Products'
+    
     context={
-        'category':json.loads(menu_category),
         'sitemap':sitemap,
         'datas':data_sended,
         'products':product_list,

@@ -1,6 +1,7 @@
 import os
 from django import template
-
+from products.views import get_categories
+import json
 register = template.Library()
 
 
@@ -24,3 +25,8 @@ def get_node_value(node_list,index):
 def get_node_url(node_list,index):
     node=get_node_value(node_list,index)
     return node.get_absolute_url()
+
+@register.inclusion_tag('nav.html')
+def show_categories():
+      category =json.loads(get_categories())
+      return { 'category' : category }

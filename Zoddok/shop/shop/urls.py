@@ -39,10 +39,12 @@ urlpatterns = [
     path('accounts/forget-password/',accountViews.forget_pass_view,name='forget-password'),
     path('accounts/forget-password-confirm/<uidb64>/<token>/',accountViews.forget_pass_comfirm_view, name='forget-password-confirm'),
     path('accounts/change-password/',accountViews.change_password,name='change-password'),
-    path('invalid-url/',views.invalid_url_view,name='invalid-url'),
+    path('page-not-found/',views.invalid_url_view,name='invalid-url'),
     re_path(r'^category/(?P<slug>.*)/$',productViews.category,name='category'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('product/<int:id>/<slug:slug>',productViews.product_detail,name="product-details"),
+    path('about-us/',views.about_view,name="about"),
+    path('contact-us/',views.contact_view,name="contact"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)

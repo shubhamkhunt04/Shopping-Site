@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, PasswordChangeForm
-from .forms import RegisterForm
+from .forms import RegisterForm, ContactForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
@@ -28,11 +28,9 @@ import json
 #authentication and authorization views  ( login , register and activation views)
 UserModel = get_user_model()
 def accountView(request):
-    category=get_categories()
     form=RegisterForm()
     context={
         'form':form,
-        'category':json.loads(category),
     }
     return render(request,'accounts.html',context=context)
 
@@ -156,7 +154,6 @@ def comparePass(request):
 
 #account activation view
 def activate(request, uidb64, token):
-    category=get_categories()
     form = RegisterForm()
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
@@ -167,7 +164,7 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
         messages.success(request,Custom_Msg.ACC_EMAIL_VERIFIED)
-        return render(request,'accounts.html',{'form': form,'category':json.loads(category)})
+        return render(request,'accounts.html',{'form': form})
     else:
         return redirect('invalid-url')
 
@@ -180,7 +177,7 @@ def custom_mail(request,email_send_type,mail_subject,message,to_email,content_su
         )
         email.content_subtype=content_subtype
         email.send()
-    elif email_send_type == "Login Code":
+    elif email_send_type == "Login Code" or email_send_type == "Contact Email":
         emailMsg = EmailMessage(
             mail_subject, message,to=[to_email],
         )
@@ -189,7 +186,6 @@ def custom_mail(request,email_send_type,mail_subject,message,to_email,content_su
 
 #register view
 def signup(request):
-    category=get_categories()
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -208,14 +204,13 @@ def signup(request):
             to_email = form.cleaned_data.get('email')
             custom_mail(request,"Account Activation",mail_subject,message,to_email,'html')
             messages.success(request,Custom_Msg.ACC_CONFIRMATION_EMAIL_SENT)
-            return render(request,'accounts.html',{'form': form,'category':json.loads(category)})
+            return render(request,'accounts.html',{'form': form})
     else:
         form = RegisterForm()
-    return render(request, 'accounts.html', {'form': form,'category':json.loads(category)})
+    return render(request, 'accounts.html', {'form': form})
 
 #login view
 def loginUser(request):
-    category=get_categories()
     form = RegisterForm()
     if request.method == 'POST' and 'otplogin' in request.POST or 'resendcode' in request.POST:
         if request.POST.get('email'):
@@ -234,15 +229,15 @@ def loginUser(request):
                 request.session.set_expiry(900)
                 if 'resendcode' in request.POST:
                     resendcode_sent=Custom_Msg.NEW_OTP_SUCC_SEND
-                    return render(request,'accounts.html',{'form':form,'otp_send_mail':to_email,'resend_code_sent':resendcode_sent,'category':json.loads(category)})
+                    return render(request,'accounts.html',{'form':form,'otp_send_mail':to_email,'resend_code_sent':resendcode_sent})
                 else:
-                    return render(request,'accounts.html',{'form':form,'otp_send_mail':to_email,'category':json.loads(category)})
+                    return render(request,'accounts.html',{'form':form,'otp_send_mail':to_email})
             except ValidationError:
                 email_error=Custom_Msg.INVALID_EMAIL_FRMT_ERR_MSG
-                return render(request,'accounts.html',{'email_error':email_error,'form':form,'category':json.loads(category)})
+                return render(request,'accounts.html',{'email_error':email_error,'form':form})
             except UserModel.DoesNotExist:
                 user_not_exsist=Custom_Msg.USER_NOT_REGISTERED_ERR_MSG
-                return render(request,'accounts.html',{'user_not_exsist':user_not_exsist,'form':form,'category':json.loads(category)})
+                return render(request,'accounts.html',{'user_not_exsist':user_not_exsist,'form':form})
         else:
             email_error=Custom_Msg.FIELD_REQUIRE_ERR_MSG
             return render(request,'accounts.html',{'email_error':email_error,'form':form})
@@ -265,10 +260,10 @@ def loginUser(request):
                             return redirect('home')
                         else:
                             password_or_otp_error=Custom_Msg.INVALID_OTP_ERR_MSG
-                            return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error,'otp_send_mail':email,'category':json.loads(category)})
+                            return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error,'otp_send_mail':email})
                     else:
                         password_or_otp_error=Custom_Msg.NO_OTP_SENT_ERR_MSG
-                        return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error,'category':json.loads(category)})
+                        return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error})
                 if request.POST.get('password') is not None:
                     user=authenticate(email=email,password=password)
                     if user is not None:
@@ -282,13 +277,13 @@ def loginUser(request):
                             return redirect('home')
                     else:
                         password_or_otp_error=Custom_Msg.INVALID_CREDS_ERR_MSG
-                        return render(request,'accounts.html',{'password_or_otp_error':password_or_otp_error,'form':form,'category':json.loads(category)})
+                        return render(request,'accounts.html',{'password_or_otp_error':password_or_otp_error,'form':form})
             except ValidationError:
                 email_error=Custom_Msg.INVALID_EMAIL_FRMT_ERR_MSG
-                return render(request,'accounts.html',{'email_error':email_error,'form':form,'category':json.loads(category)})
+                return render(request,'accounts.html',{'email_error':email_error,'form':form})
             except UserModel.DoesNotExist:
                 user_not_exsist=Custom_Msg.USER_NOT_REGISTERED_ERR_MSG
-                return render(request,'accounts.html',{'user_not_exsist':user_not_exsist,'form':form,'category':json.loads(category)})
+                return render(request,'accounts.html',{'user_not_exsist':user_not_exsist,'form':form})
         else:
             email=request.POST.get('email')
             email_error=''
@@ -314,7 +309,7 @@ def loginUser(request):
            
             return render(request,'accounts.html',{'form':form,'password_or_otp_error':password_or_otp_error,'email_error':email_error,'otp_send_mail':otp_send_mail,'category':json.loads(category)})
     else:
-        return render(request,'accounts.html',{'form':form,'category':json.loads(category)})
+        return render(request,'accounts.html',{'form':form})
 
 #logout view
 def logoutUser(request):
@@ -346,12 +341,12 @@ def forget_pass_view(request):
                     return redirect('accounts')
             except ValidationError:
                 email_error=Custom_Msg.INVALID_EMAIL_FRMT_ERR_MSG
-                return render(request,'forget_password.html',{'email_error':email_error,'form':forget_pass_form,'category':json.loads(category)})
+                return render(request,'forget_password.html',{'email_error':email_error,'form':forget_pass_form})
             except UserModel.DoesNotExist:
                 user_not_exsist=Custom_Msg.USER_NOT_REGISTERED_ERR_MSG
-                return render(request,'forget_password.html',{'user_not_exsist':user_not_exsist,'form':forget_pass_form,'category':json.loads(category)})
+                return render(request,'forget_password.html',{'user_not_exsist':user_not_exsist,'form':forget_pass_form})
 
-    return render(request,'forget_password.html',{'form':forget_pass_form,'category':json.loads(category)})
+    return render(request,'forget_password.html',{'form':forget_pass_form})
 
 
 def forget_pass_comfirm_view(request, uidb64, token):
@@ -378,7 +373,7 @@ def forget_pass_comfirm_view(request, uidb64, token):
         except(TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
             user = None
             return redirect('invalid-url')
-    return render(request,'forget_password_confirm.html',{'form':pass_confirm,'category':json.loads(category)})
+    return render(request,'forget_password_confirm.html',{'form':pass_confirm})
 
 
 @login_required
@@ -391,4 +386,4 @@ def change_password(request):
             form.save()
             login(request,request.user)
             return redirect('home')
-    return render(request,'change_password.html',{'form':form,'category':json.loads(category)})
+    return render(request,'change_password.html',{'form':form})

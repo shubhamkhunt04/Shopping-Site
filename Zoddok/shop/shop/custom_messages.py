@@ -16,3 +16,4 @@ ACC_EMAIL_VERIFIED='Thank you for your email confirmation. Now you can login you
 NEW_OTP_SUCC_SEND='A new OTP has been sent to your email address.'
 PASS_RESET_EMAIL_SENT="We've emailed you instructions for setting your password, please check your mail for further details."
 PASS_RESET_SUCC="Your password has been successfully reset. Now you can login your account."
+CONTACT_MAIL_SENT='Thank you, your message has been sent.'

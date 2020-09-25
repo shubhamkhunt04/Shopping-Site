@@ -1,7 +1,8 @@
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
-from .models import CustomUser
+from .models import CustomUser, Contact
+import datetime
 
 #register from specified here with custom fields
 class RegisterForm(UserCreationForm):
@@ -11,3 +12,8 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model=CustomUser
         fields=['email','password1','password2']
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model=Contact
+        fields=['contact_name','contact_email','message']

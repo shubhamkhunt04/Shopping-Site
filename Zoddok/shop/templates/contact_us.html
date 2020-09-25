@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block meta_tags %}
+    <!-- Author Meta -->
+    <meta name="author" content="">
+    <!-- Meta Description -->
+    <meta name="description" content="">
+    <!-- Meta Keyword -->
+    <meta name="keywords" content="">
+{% endblock %}
+
+{% block title_tag %}Contact Us{% endblock %}
+
+{% block custom_css_and_links %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+<style>
+    .my-form {
+        color: #305896;
+    }
+    .my-form .btn-default {
+        background-color: #305896;
+        color: #fff;
+        border-radius: 0;
+    }
+    .my-form .btn-default:hover {
+        background-color: #4498C6;
+        color: #fff;
+    }
+    .my-form .form-control {
+        border-radius: 0;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrum %}
+<section class="banner-area organic-breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-banner d-flex flex-wrap align-items-center">
+            <div class="col-lg-12 col-xs-12 col-first col-sm-12 d-flex flex-wrap align-items-center">
+                <a href="{% url 'home'%}">Home&nbsp;&nbsp;<i class="fa fa-caret-right" aria-hidden="true"></i>&nbsp;</a>
+                <a href="{% url 'contact'%}">Contact Us</a>
+            </div>
+        </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block content %}
+
+<div class="container mb-5">
+    <div class="container">
+        <div class="row success-messages">
+            {% if messages %}
+            {% for message in messages %}
+                {% if  message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                <span class="text-center"><i class="fa fa-check-circle-o" aria-hidden="true"></i>&nbsp;&nbsp;{{message}}</span>
+                {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    <div><h1>Contact Us</h1></div>
+    <div class='mb-3 mt-2 banner-area' style="width:30%;height:4px;border-radius: 25px;"></div>
+    <br />
+    <div class="row">
+        <div class="col-md-6" style="margin-bottom: 10%;">
+            <div id="googlemap" style="width:100%; height:350px;"></div>
+        </div>
+        <br />
+        <div class="col-md-6">
+            <form class="my-form" method="POST" action="{% url 'contact' %}">
+                {% csrf_token %}
+                {% for field in form %}
+                    {% ifequal field.name 'contact_name' %}
+                        <div class="form-group">
+                            <label for="form-name">Name</label>
+                            <input type="text" class="common-input" id="id_contact_name" name="contact_name" placeholder="Name">
+                        </div>
+                    {% endifequal %}
+                    {% ifequal field.name 'contact_email' %}
+                    <div class="form-group">
+                        <label for="form-email">Email Address</label>
+                        <input type="email" class="common-input" id="id_contact_email" name="contact_email" placeholder="Email Address">
+                    </div>
+                    {% endifequal %}
+                    {% ifequal field.name 'message' %}
+                    <div class="form-group">
+                        <label for="form-message">Email your Message</label>
+                        <textarea class="common-input" id="id_message" name="message" placeholder="Message" rows="5"></textarea>
+                    </div>
+                    {% endifequal %}
+                    {% for error in field.errors %}
+                        <span class="error" id="field_errors">{{ error }}</span><br/>
+                    {% endfor %}
+                {% endfor %}
+                <button class="btn btn-block" type="submit">Contact Us</button>             
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+<script type="text/javascript">
+    jQuery(function ($) {
+        // Google Maps setup
+        var googlemap = new google.maps.Map(
+            document.getElementById('googlemap'),
+            {
+                center: new google.maps.LatLng(44.5403, -78.5463),
+                zoom: 8,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+        );
+    });
+</script>
+{% endblock %}

@@ -1,11 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
-from .forms import RegisterForm
+from .models import CustomUser, Contact
+from .forms import RegisterForm, ContactForm
+from django.contrib import admin
 
 # Register your models here.
-
-
 class CustomUserAdmin(UserAdmin):
     model=CustomUser
     add_form=RegisterForm
@@ -22,4 +21,12 @@ class CustomUserAdmin(UserAdmin):
         (None, {'fields': ('email', 'password1', 'password2')}),
     )
 
+class ContactAdmin(admin.ModelAdmin):
+    model=Contact
+    ordering=('-contacted_on',)
+    list_display = ('contact_email','contact_name','message')
+    list_filter = ('contacted_on',)
+    search_fields = ('contact_name','contact_mail','message')
+
+admin.site.register(Contact,ContactAdmin)
 admin.site.register(CustomUser,CustomUserAdmin)
