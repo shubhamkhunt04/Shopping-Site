@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from urllib import request
 from products.models import Category
-from accounts.forms import ContactForm
-from accounts.views import custom_mail
+from .forms import ContactForm
 from shop import custom_messages as Custom_Msg
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError

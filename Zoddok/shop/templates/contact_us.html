@@ -77,12 +77,14 @@
                         <div class="form-group">
                             <label for="form-name">Name</label>
                             <input type="text" class="common-input" id="id_contact_name" name="contact_name" placeholder="Name">
+                            <span class="error" id="contact_error"></span>
                         </div>
                     {% endifequal %}
                     {% ifequal field.name 'contact_email' %}
                     <div class="form-group">
                         <label for="form-email">Email Address</label>
                         <input type="email" class="common-input" id="id_contact_email" name="contact_email" placeholder="Email Address">
+                        <span class="error" id="email_error"></span>
                     </div>
                     {% endifequal %}
                     {% ifequal field.name 'message' %}
@@ -105,14 +107,17 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{% static 'js/accounts.js' %}"></script> 
 <script src="https://maps.googleapis.com/maps/api/js"></script>
 <script type="text/javascript">
+    validate_email("#id_contact_email","#email_error");
+    validate_name("#id_contact_name","#contact_error");
     jQuery(function ($) {
         // Google Maps setup
         var googlemap = new google.maps.Map(
             document.getElementById('googlemap'),
             {
-                center: new google.maps.LatLng(44.5403, -78.5463),
+                center: new google.maps.LatLng(21.082034, 72.5463),
                 zoom: 8,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             }

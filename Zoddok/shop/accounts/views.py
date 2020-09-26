@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, PasswordChangeForm
-from .forms import RegisterForm, ContactForm
+from .forms import RegisterForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
@@ -23,7 +23,7 @@ import gzip
 from pathlib import Path
 from shop import custom_messages as Custom_Msg
 from products.views import get_categories
-import json
+import json, re
 
 #authentication and authorization views  ( login , register and activation views)
 UserModel = get_user_model()
@@ -33,6 +33,28 @@ def accountView(request):
         'form':form,
     }
     return render(request,'accounts.html',context=context)
+
+
+def name_validate(request):
+    if request.method == 'POST':
+        name=request.POST['contact_name']
+        data={}
+        reg = re.compile(r'^[A-Za-z]+$')
+        if not reg.match(name):
+            data={
+                'status': 200,
+                'is_valid': False,
+                'error_msg': "Name must be in aphabets only."
+
+            }
+        else:
+            data={
+                'status': 200,
+                'is_valid': True
+            }
+        return JsonResponse(data)
+    else:
+        return redirect('contact')
 
 #customely validate email on onchange event of input using ajax and validate_email
 def validateEmail(request):

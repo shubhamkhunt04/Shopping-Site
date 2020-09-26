@@ -32,6 +32,7 @@ urlpatterns = [
     path('accounts/logout/',accountViews.logoutUser,name='logout'),
     path('activate/<uidb64>/<token>/',accountViews.activate, name='activate'),
     path('validateEmail/',accountViews.validateEmail,name='validateEmail'),
+    path('validateName/',accountViews.name_validate,name='validateName'),
     path('validatePass/',accountViews.validatePass,name='validatePass',),
     path('numericPass/',accountViews.numericPass,name='numericPass',),
     path('comparePass/',accountViews.comparePass,name='comparePass',),

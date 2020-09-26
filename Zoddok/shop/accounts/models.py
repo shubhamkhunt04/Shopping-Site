@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
+
+
 # Create your models here.
 
 #custom user manager model
@@ -49,8 +51,6 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
-class Contact(models.Model):
-    contact_name=models.CharField(max_length=50)
-    contact_email=models.EmailField(max_length=255)
-    message=models.TextField()
-    contacted_on=models.DateTimeField(null=True,blank=True,auto_now_add=True)
+
+
+

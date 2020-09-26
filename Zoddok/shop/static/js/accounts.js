@@ -15,7 +15,22 @@ function getCookie(name) {
 }
 var csrftoken = getCookie('csrftoken');
 
-
+function get_sort(){
+    $.ajax({
+        type: "POST",
+        url: "{% url 'category' sitemap%}",
+        data:{
+            'csrfmiddlewaretoken': csrftoken,
+            'sort_filter':document.getElementById("name").value
+        },
+        dataType: 'json',
+        beforeSend: function() {
+        
+        },
+        success: function(data){
+        }
+    });
+}
 
 //function to check all errors and replace same error to avoid printing same errors on webpage
 function get_all_errors(className,idName,data){
@@ -56,7 +71,34 @@ function showPass_func(className,idName){
     });
 }
 
-
+function validate_name(id,error_id){
+    //email validation onchane for register form
+    $(function(){
+        $(id).on('change', function(){
+            $.ajax({
+                type: "POST",
+                url: "http://127.0.0.1:8000/validateName/",
+                data:{
+                    'csrfmiddlewaretoken': csrftoken,
+                    'contact_name':document.getElementById(id.substr(1,id.length)).value
+                },
+                dataType: 'json',
+                beforeSend: function() {
+                
+                },
+                success: function(data){
+                    if(data.is_valid)
+                    {
+                        $(error_id).html('');
+                    }
+                    else{
+                        $(error_id).html(data.error_msg);
+                    }
+                }
+            });
+        })
+    });
+}
 
 function validate_email(id,email_error_id){
     //email validation onchane for register form

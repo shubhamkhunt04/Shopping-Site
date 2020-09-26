@@ -14,15 +14,28 @@
             <meta name="description" content="{{c.meta_description}}">
             <!-- Meta Keyword -->
             <meta name="keywords" content="{{c.meta_keywords}}">
-        {% endif %}        
-    {% endfor %}
+            {% endif %}        
+        {% endfor %}
     
 {% endblock %}
 
-{% block title_tag %}{% endblock %}
+{% block title_tag %}
+    {% for c in sitemap|times %}
+        {% if c == sitemap|var_length %}
+            {% get_node_value sitemap c as c %}{{c.title}}
+        {% endif %}        
+    {% endfor %}
+{% endblock %}
 
 {% block custom_css_and_links %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+<style>
+    li.sort-link a{
+        text-decoration: none;
+        color: black;
+        font-weight: 500;
+    }
+</style>
 {% endblock %}
 
 {% block breadcrum %}
@@ -156,7 +169,7 @@
         </div>
         <div class="col-xl-3 col-lg-4 col-md-5">
             <div class="sidebar-categories">
-                <div class="head">Categories</div>
+                <div class="head">Show Results For</div>
                     <ul class="main-categories">
                     {% for c in sitemap|times %}
                         {% if c == sitemap|var_length %}
@@ -169,7 +182,29 @@
                     {% endfor %}
                     </ul>
             </div>
-            
+            <div class="sidebar-filter mt-50">
+                <div class="top-filter-head">Product Filters</div>
+                <div class="common-filter">
+                    <div class="head">FIlter By</div>
+                        <ul>
+                            <li class="filter-list sort-link"><i class="fa fa-long-arrow-right" aria-hidden="true"></i><a href='?ordering=name'>Name</a></li>
+                            <li class="filter-list sort-link"><i class="fa fa-long-arrow-right" aria-hidden="true"></i><a href="?ordering=price">Price</a></li>
+                            <li class="filter-list sort-link"><i class="fa fa-long-arrow-right" aria-hidden="true"></i><a href="?availabel=In-Stock">In Stock</a></li>
+                            <li class="filter-list sort-link"><i class="fa fa-long-arrow-right" aria-hidden="true"></i><a href="?availabel=Out-of-Stock">Out of Stock</a></li>
+                        </ul>
+                </div>
+                <div class="common-filter">
+                    <div class="head">Price</div>
+                    <div class="price-range-area">
+                        <div id="price-range"></div>
+                        <div class="value-wrapper d-flex">
+                            <div class="price">Price:</div>
+                            <span><i class="fa fa-inr"></i></span><div id="lower-value"></div> <div class="to">to</div> 
+                            <span><i class="fa fa-inr"></i></span><div id="upper-value"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

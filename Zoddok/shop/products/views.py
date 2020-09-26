@@ -10,7 +10,6 @@ from django.shortcuts import get_object_or_404
 import string 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-
 # Create your views here.
 def get_categories():
     root=Category.objects._mptt_filter(level=0)
@@ -29,7 +28,6 @@ def recursive_node_to_dict(node):
 
 def product_detail(request,id,slug):
     query = request.GET.get('q')
-    
     try:
         product = Product.objects.get(pk=id)
     except:
@@ -114,6 +112,12 @@ def category(request,slug):
                 category = rs
                 break
         product_list=Product.objects.filter(category_id=category.id)
+        if request.GET.get('ordering','') == 'name':
+            product_list=Product.objects.filter(category_id=category.id).order_by('title')
+        if request.GET.get('ordering','') == 'price':
+            product_list=Product.objects.filter(category_id=category.id).order_by('price')
+        if request.GET.get('availabel','') == 'In-Stock' or request.GET.get('availabel','') == 'Out-of-Stock':
+            product_list=Product.objects.filter(category_id=category.id,stocks=request.GET.get('availabel'))
         paginator = Paginator(product_list, 15)
         try:
             product_list = paginator.page(page)

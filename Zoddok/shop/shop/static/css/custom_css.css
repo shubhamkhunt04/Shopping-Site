@@ -1,0 +1,103 @@
+.error{
+    color: red;
+}
+section.banner-area div.container{
+    padding:1%;
+}
+section.banner-area div.container a{
+    color:white;
+    text-decoration: none;
+    font-weight: 400;
+}
+.success-messages{
+    background-color:#2ecc71;margin-bottom: 2%;margin-top: -4%;
+}
+.success-messages span{
+    color:white;font-size:16px;font-weight: 400;margin:2%;
+}
+.account-form{
+    margin-bottom: 4%;
+}
+.account-form .login-form label{
+    color: black;
+    font-weight: 400;
+}
+.account-form .login-form .help-text{
+    color:#3498db;
+}
+.account-form .login-form .account-sub-title{
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.account-form .login-form .passtrengthMeter input{
+    border:none;
+    display: block;
+    width: 100%;
+    border: 1px solid #eee;
+    line-height: 40px;
+    padding: 0 30px;
+    margin-top: 10px;
+}
+
+.passtrengthMeter .showPassword.active{
+    opacity: .5;
+}
+
+.passtrengthMeter .showPassword img{
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.passtrengthMeter .showPassword:hover{
+    cursor: pointer;
+}
+.or-container {
+    align-items: center;
+    color: #ccc;
+    display: flex;
+    margin: 25px 0
+}
+
+.line-separator {
+    background-color: #ccc;
+    flex-grow: 5;
+    height: 1px
+}
+
+.or-label {
+    flex-grow: 1;
+    margin: 0 15px;
+    color:black;
+    font-weight: 400;
+    text-align: center
+}
+.btn-google{
+    background-color:white;
+    color:black;
+    padding:2%;
+    font-weight: 600;
+    font-size: 17px;
+    border:1px solid gray;
+}
+.btn-google:hover{
+    color:black;
+}
+.btn-google img{
+    width: 6%;
+    margin-right: 3%;
+}
+.dropdown-header span.main_title{
+    font-size: 18px;
+    font-weight: 600;
+    color: black;
+}
+.dropdown-item{
+    font-size: 14px;
+    font-weight: 400;
+}
+.container .product-quick-view .quick-view-content .col-lg-6 .product-btns p.available_title{
+    font-size: medium;
+    font-weight: 600;
+}
