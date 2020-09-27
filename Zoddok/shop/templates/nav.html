@@ -2,14 +2,14 @@
 {% load mptt_tags %}
 {% load env_extras %}
 <a class="navbar-brand" href="#">
-    <img src="{% static 'img/logo.png' %}" alt="">
+    <img src="/media/img/logo.png" alt="">
 </a>
 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
   <span class="navbar-toggler-icon"></span>
 </button>
 <div class="collapse navbar-collapse justify-content-end align-items-center" id="navbarSupportedContent">
   <ul class="navbar-nav">
-      <li><a href="#home">Home</a></li>
+      <li><a href="{% url 'home' %}">Home</a></li>
       <li class="dropdown">
         <a class="dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
           Category

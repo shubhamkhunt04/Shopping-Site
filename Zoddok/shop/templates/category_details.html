@@ -35,6 +35,10 @@
         color: black;
         font-weight: 500;
     }
+    li.sort-link span{
+        font-weight: 600;
+        margin-right: 3%;
+    }
 </style>
 {% endblock %}
 
@@ -185,24 +189,35 @@
             <div class="sidebar-filter mt-50">
                 <div class="top-filter-head">Product Filters</div>
                 <div class="common-filter">
-                    <div class="head">FIlter By</div>
+                    <div class="head">Filter By</div>
                         <ul>
-                            <li class="filter-list sort-link"><i class="fa fa-long-arrow-right" aria-hidden="true"></i><a href='?ordering=name'>Name</a></li>
-                            <li class="filter-list sort-link"><i class="fa fa-long-arrow-right" aria-hidden="true"></i><a href="?ordering=price">Price</a></li>
-                            <li class="filter-list sort-link"><i class="fa fa-long-arrow-right" aria-hidden="true"></i><a href="?availabel=In-Stock">In Stock</a></li>
-                            <li class="filter-list sort-link"><i class="fa fa-long-arrow-right" aria-hidden="true"></i><a href="?availabel=Out-of-Stock">Out of Stock</a></li>
+                            {% for c in sitemap|times %}
+                                {% if c == sitemap|var_length %}
+                                <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% get_node_value sitemap c as c %}{{c.get_absolute_url}}">All</a></li>
+                                {% endif %}        
+                            {% endfor %}
+                            <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'ordering' 'title' %}">Name A-Z</a></li>
+                            <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'ordering' '-title' %}">Name Z-A</a></li>
+                            <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'ordering' 'price' %}">Price Low to High</a></li>
+                            <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'ordering' '-price' %}">Price High to Low</a></li>
+                            <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'availabel' 'In-Stock' %}">In Stock</a></li>
+                            <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'availabel' 'Out-Of-Stock' %}">Out of Stock</a></li>
                         </ul>
                 </div>
                 <div class="common-filter">
                     <div class="head">Price</div>
-                    <div class="price-range-area">
-                        <div id="price-range"></div>
-                        <div class="value-wrapper d-flex">
-                            <div class="price">Price:</div>
-                            <span><i class="fa fa-inr"></i></span><div id="lower-value"></div> <div class="to">to</div> 
-                            <span><i class="fa fa-inr"></i></span><div id="upper-value"></div>
-                        </div>
-                    </div>
+                    <ul>
+                        {% for c in sitemap|times %}
+                            {% if c == sitemap|var_length %}
+                            <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% get_node_value sitemap c as c %}{{c.get_absolute_url}}">Any Price</a></li>
+                            {% endif %}        
+                        {% endfor %}
+                        <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'price_to' '1000' as c%}{% remove_to c 'price_from' %}">Under<i class="fa fa-inr mr-0 ml-5" aria-hidden="true"></i>1000</a></li>
+                        <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'price_from' '1000' as c %}{% query_transform c 'price_to' '5000' %}"><i class="fa fa-inr mr-0" aria-hidden="true"></i>1000  -  <i class="fa fa-inr mr-0" aria-hidden="true"></i>5000</a></li>
+                        <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'price_from' '5000' as c %}{% query_transform c 'price_to' '10000' %}"><i class="fa fa-inr mr-0" aria-hidden="true"></i>5000  -  <i class="fa fa-inr mr-0" aria-hidden="true"></i>10000</a></li>
+                        <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'price_from' '10000' as c %}{% query_transform c 'price_to' '20000' %}"><i class="fa fa-inr mr-0" aria-hidden="true"></i>10000  -  <i class="fa fa-inr mr-0" aria-hidden="true"></i>20000</a></li>
+                        <li class="filter-list sort-link"><span class="lnr lnr-arrow-right"></span><a href="{% query_transform request.get_full_path 'price_from' '20000' as c%}{% remove_to c 'price_to' %}">Over<i class="fa fa-inr mr-0 ml-5" aria-hidden="true"></i>20000</a></li>
+                    </ul>
                 </div>
             </div>
         </div>

@@ -75,6 +75,7 @@
                 </div>
                 </div>
             </nav>
+            
         </header>
         <!-- End Header Area -->
 
@@ -126,8 +127,8 @@
                             <div class="footer-social d-flex align-items-center">
                                 <a href="{% get_env_var 'FACEBOOK_AC' %}"><i class="fa fa-facebook"></i></a>
                                 <a href="{% get_env_var 'INSTA_AC' %}"><i class="fa fa-instagram"></i></a>
-                                <a href="#"><i class="fa fa-twitter"></i></a>
-                                <a href="#"><i class="fa fa-youtube-play"></i></a>
+                                <a href="{% get_env_var 'TWITTER_AC' %}"><i class="fa fa-twitter"></i></a>
+                                <a href="{% get_env_var 'YOUTUBE_AC' %}"><i class="fa fa-youtube-play"></i></a>
                             </div>
                         </div>
                     </div>                          
@@ -156,7 +157,7 @@
         <script>
             $(document).ready(function(){
                 $.ajax({
-                    url:"https://www.instagram.com/zoddok__?__a=1",
+                    url:"{% get_env_var 'INSTA_AC' %}?__a=1",
                     type:'get',
                     success:function(response){
                     posts = response.graphql.user.edge_owner_to_timeline_media.edges;

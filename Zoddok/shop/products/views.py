@@ -9,6 +9,7 @@ import json
 from django.shortcuts import get_object_or_404
 import string 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Avg, Max, Min, Sum
 
 # Create your views here.
 def get_categories():
@@ -111,13 +112,30 @@ def category(request,slug):
             if rs.title == category:
                 category = rs
                 break
-        product_list=Product.objects.filter(category_id=category.id)
-        if request.GET.get('ordering','') == 'name':
-            product_list=Product.objects.filter(category_id=category.id).order_by('title')
-        if request.GET.get('ordering','') == 'price':
-            product_list=Product.objects.filter(category_id=category.id).order_by('price')
+
+        order_by_filter=''
+        filter_stock=''
+        price_from=0
+        price_to=Product.objects.all().aggregate(Max('price'))['price__max']
+        print(price_to)
+        if request.GET.get('ordering','') == 'title' or request.GET.get('ordering','') == '-title' or request.GET.get('ordering','') == '-price'  or request.GET.get('ordering','') == 'price':
+            order_by_filter=request.GET.get('ordering','')
         if request.GET.get('availabel','') == 'In-Stock' or request.GET.get('availabel','') == 'Out-of-Stock':
-            product_list=Product.objects.filter(category_id=category.id,stocks=request.GET.get('availabel'))
+            filter_stock=request.GET.get('availabel','')
+        if request.GET.get('price_from','') != '':
+            price_from=request.GET.get('price_from')
+        if request.GET.get('price_to','') != '':
+            price_to=request.GET.get('price_to')
+
+        if order_by_filter == '' and filter_stock == '':
+            product_list=Product.objects.filter(category_id=category.id,price__range=(price_from,price_to))
+        elif order_by_filter == '' and filter_stock != '':
+            product_list=Product.objects.filter(category_id=category.id,stocks=filter_stock,price__range=(price_from,price_to))
+        elif order_by_filter !='' and filter_stock == '':
+            product_list=Product.objects.filter(category_id=category.id,price__range=(price_from,price_to)).order_by(order_by_filter)
+        elif order_by_filter !='' and filter_stock != ' ':
+            product_list=Product.objects.filter(category_id=category.id,stocks=filter_stock,price__range=(price_from,price_to)).order_by(order_by_filter)
+
         paginator = Paginator(product_list, 15)
         try:
             product_list = paginator.page(page)
