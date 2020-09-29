@@ -78,9 +78,8 @@
                                 <div class="content-overlay"></div>
                                     <img class="content-image img-fluid d-block mx-auto" src="{{rs.image.url}}" alt="">
                                 <div class="content-details fadeIn-bottom">
-                                        <div class="bottom d-flex align-items-center justify-content-center">
-                                            <a href="{{rs.slug}}"><span class="lnr lnr-eye"></span></a>
-                                            <a href="#"><span class="lnr lnr-heart"></span></a>
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <a href="{{rs.slug}}" class="view-btn color-2"><span>View More</span><span class="ml-3 fa fa-eye" aria-hidden="true"></span></a>
                                         </div>
                                 </div>
                             </div>
@@ -100,7 +99,11 @@
                                 <div class="content-details fadeIn-bottom">
                                         <div class="bottom d-flex align-items-center justify-content-center">
                                             <a href="/product/{{rs.id}}/{{rs.slug}}"><span class="lnr lnr-eye"></span></a>
-                                            <a href="#"><span class="lnr lnr-heart"></span></a>
+                                            {% if rs.id in liked_by_user %}
+                                                <a href="{% url 'add-favorite' rs.id %}"><span class="fa fa-heart"></span></a>
+                                            {% else %}
+                                                <a href="{% url 'add-favorite' rs.id %}"><span class="fa fa-heart-o"></span></a>
+                                            {% endif %}
                                             <a href="#"><span class="lnr lnr-cart"></span></a>
                                         </div>
                                 </div>

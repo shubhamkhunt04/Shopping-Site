@@ -10,6 +10,9 @@ from django.shortcuts import get_object_or_404
 import string 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Avg, Max, Min, Sum
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def get_categories():
@@ -27,6 +30,14 @@ def recursive_node_to_dict(node):
         obj['children'].append(recursive_node_to_dict(child))
     return obj
 
+def check_user_has_prodcut_in_favorites(request,product):
+    liked=False
+    if product.favorite.filter(id=request.user.id).exists():
+        liked=True
+    else:
+        liked=False
+    return liked
+
 def product_detail(request,id,slug):
     query = request.GET.get('q')
     try:
@@ -38,9 +49,13 @@ def product_detail(request,id,slug):
     category=Category.objects.get(pk=category.id).get_ancestors()
     images = Images.objects.filter(product_id=id)
     social_links=SocialLinks.objects.filter(product_id=id)
+
+    liked=check_user_has_prodcut_in_favorites(request,product)
+
     context = {'product': product,'product_category': category,
-               'images': images,'sociallinks':social_links,
+               'images': images,'sociallinks':social_links,'liked_by_user':liked,
                }
+
     if product.variant !="None": # Product have variants
         if request.method == 'POST': #if we select color
             variant_id = request.POST.get('variantid')
@@ -95,6 +110,7 @@ def category(request,slug):
     sub_categories=''
     product_list=''
     data_sended=''
+    liked={}
     if category.get_descendants():
         sub_categories = cache_tree_children(category.get_descendants())
         paginator = Paginator(sub_categories, 15)
@@ -143,12 +159,37 @@ def category(request,slug):
             product_list = paginator.page(1)
         except EmptyPage:
             product_list = paginator.page(paginator.num_pages)
+
+        for p in product_list:
+            like=check_user_has_prodcut_in_favorites(request,p)
+            if like:
+                liked[p.id]=like
+
         data_sended='Products'
     
     context={
         'sitemap':sitemap,
         'datas':data_sended,
         'products':product_list,
+        'liked_by_user':liked,
         'sub_categories':sub_categories,
     }
     return render(request,"category_details.html",context)
+
+@login_required
+def add_to_favorite(request,id):
+    product=Product.objects.get(pk=id)
+    if product.favorite.filter(id=request.user.id).exists():
+        product.favorite.remove(request.user)
+    else:
+        product.favorite.add(request.user)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+def view_favorites(request):
+    product_list=Product.objects.all()
+    products=[]
+    for p in product_list:
+        if p.favorite.filter(id=request.user.id).exists():
+            products.append(p)
+    return render(request,"your_favorite_list.html",{'products':products})

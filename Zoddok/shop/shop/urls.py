@@ -44,6 +44,8 @@ urlpatterns = [
     re_path(r'^category/(?P<slug>.*)/$',productViews.category,name='category'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('product/<int:id>/<slug:slug>',productViews.product_detail,name="product-details"),
+    path('addfavorite/<int:id>',productViews.add_to_favorite,name='add-favorite'),
+    path('favorites/',productViews.view_favorites,name='your-favorites'),
     path('about-us/',views.about_view,name="about"),
     path('contact-us/',views.contact_view,name="contact"),
 ]

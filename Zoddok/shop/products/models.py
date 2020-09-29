@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from ckeditor_uploader.fields import RichTextUploadingField
 from mptt.templatetags.mptt_tags import cache_tree_children
+from accounts.models import CustomUser
 
 class Category(MPTTModel):
     STATUS=(
@@ -127,6 +128,8 @@ class Product(models.Model):
     status=models.CharField(max_length=10,choices=STATUS)
     create_at=models.DateTimeField(auto_now_add=True)
     update_at=models.DateTimeField(auto_now=True)
+    favorite = models.ManyToManyField(CustomUser,related_name='product_favorite',)
+
     def __str__(self):
         return self.title
 
