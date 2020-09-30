@@ -13,6 +13,7 @@ from django.db.models import Avg, Max, Min, Sum
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 # Create your views here.
 def get_categories():
@@ -181,8 +182,10 @@ def add_to_favorite(request,id):
     product=Product.objects.get(pk=id)
     if product.favorite.filter(id=request.user.id).exists():
         product.favorite.remove(request.user)
+        messages.success(request, "Removed from your Favorites")
     else:
         product.favorite.add(request.user)
+        messages.success(request, "Added to your Favorites")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required

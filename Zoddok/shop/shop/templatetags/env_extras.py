@@ -103,3 +103,8 @@ def show_categories():
       category =json.loads(get_categories())
       return { 'category' : category }
 
+
+@register.inclusion_tag('category_dropdown.html')
+def show_categorie_dropdown():
+      category =json.loads(get_categories())
+      return { 'category' : category }

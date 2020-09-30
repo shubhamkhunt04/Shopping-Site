@@ -101,3 +101,74 @@ section.banner-area div.container a{
     font-size: medium;
     font-weight: 600;
 }
+    /*
+*
+* ==========================================
+* FOR DEMO PURPOSES
+* ==========================================
+*
+*/
+
+.social-link {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    border-radius: 50%;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+  }
+  
+  .social-link:hover,
+  .social-link:focus {
+    background: #ddd;
+    text-decoration: none;
+    color: #555;
+  }
+
+  li.sort-link a{
+    text-decoration: none;
+    color: black;
+    font-weight: 500;
+}
+li.sort-link span{
+    font-weight: 600;
+    margin-right: 3%;
+}
+.my-form {
+    color: #305896;
+}
+.my-form .btn-default {
+    background-color: #305896;
+    color: #fff;
+    border-radius: 0;
+}
+.my-form .btn-default:hover {
+    background-color: #4498C6;
+    color: #fff;
+}
+.my-form .form-control {
+    border-radius: 0;
+}
+
+.showPassword{
+    margin-top:6px;
+  }
+  .error,.success{
+    font-size:15px;
+  }
+  .success{
+    color:green;
+  }
+
+  .toastClass{
+    background-color:#2d3436;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    width: 1500px;
+    padding:10px 10px 10px 10px;
+}

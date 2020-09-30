@@ -29,9 +29,18 @@
     <link rel="stylesheet" href="{% static 'css/ion.rangeSlider.css' %}" />
     <link rel="stylesheet" href="{% static 'css/ion.rangeSlider.skinFlat.css' %}" />
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'css/nouislider.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- pull the css -->
+        <link rel="stylesheet" href="https://unpkg.com/toastedjs/dist/toasted.min.css">
+
+        <!-- pull the js file -->
+        <script src="https://unpkg.com/toastedjs/dist/toasted.min.js"></script>
+
+       
     {% block custom_css_and_links %}
     {% endblock %}
     </head>
@@ -48,7 +57,7 @@
                         </ul>
                         <ul class="list">
                             {% if user.is_authenticated %}
-                                <li><a class="" href="{% url 'logout' %}"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;&nbsp;Logout</a></li>
+                                
                             {% else %}
                                 <li><a href="{% url 'accounts' %}">Login</a></li>
                             {% endif %}
@@ -59,27 +68,48 @@
             <!--nav bar loads from nav.html using show_categories template tag function-->
             <nav class="navbar navbar-expand-lg  navbar-light">
                 <div class="container">
-                {% show_categories %}
-                {% if user.is_authenticated %}
-                        <li class="dropdown">
-                        <a class="dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            Account
-                        </a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="{% url 'your-favorites' %}"><i class="fa fa-heart-o" aria-hidden="true"></i>&nbsp;&nbsp;Your Wishlist</a>
-                            <a class="dropdown-item" href="{% url 'change-password' %}">Change Password</a>
-                        </div>
-                        </li>
-                    {% endif %}									
-                </ul>
+                    <a class="navbar-brand" href="#">
+                        <img src="/media/img/logo.png" alt="">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                      <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-end align-items-center" id="navbarSupportedContent">
+                      <ul class="navbar-nav">
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                Category
+                                </a>
+                                <div class="dropdown-menu">
+                                    {% show_categories %}
+                                </div>
+                            </li>
+                            <li><a href="{% url 'about' %}">About</a></li>
+                            <li><a href="{% url 'contact' %}">Contact</a></li>
+                    
+                            {% if user.is_authenticated %}
+                                <li class="dropdown">
+                                <a class="dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                    Account
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'your-favorites' %}"><i class="fa fa-heart-o" aria-hidden="true"></i>&nbsp;&nbsp;Your Wishlist</a>
+                                    <a class="dropdown-item" href="{% url 'change-password' %}">Change Password</a>
+                                    <a class="dropdown-item" href="{% url 'logout' %}"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;&nbsp;Logout</a>
+                                </div>
+                                </li>
+                            {% endif %}									
+                        </ul>
+                    </div>
                 </div>
-                </div>
+                
             </nav>
-            
         </header>
         <!-- End Header Area -->
 
         <!-- Start Banner Area -->
+
         {% block breadcrum %}
         {% endblock %}
         <!-- End Banner Area -->
@@ -149,7 +179,7 @@
         <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
         <script src="{% static 'js/jquery.sticky.js' %}"></script>
         <script src="{% static 'js/ion.rangeSlider.js' %}"></script>
-        <script src="{% static 'bootstrap.bundle.min' %}"></script>
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
         <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
         <script src="{% static 'js/owl.carousel.min.js' %}"></script>           
         <script src="{% static 'js/main.js' %}"></script>  

@@ -28,18 +28,7 @@
 {% endblock %}
 
 {% block custom_css_and_links %}
-<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
-<style>
-    li.sort-link a{
-        text-decoration: none;
-        color: black;
-        font-weight: 500;
-    }
-    li.sort-link span{
-        font-weight: 600;
-        margin-right: 3%;
-    }
-</style>
+
 {% endblock %}
 
 {% block breadcrum %}
@@ -231,4 +220,18 @@
 
 {% block scripts %}
 <script src="{% static 'js/nouislider.min.js' %}"></script>
+<script>
+    var toasted = new Toasted({
+        position : 'bottom-center',
+        theme : 'primary',
+        duration:5000,
+        className:'toastClass',
+        fullWidth:true,
+    })
+</script>
+{% if messages %}
+    {% for message in messages %}
+            <script>toasted.show("<span class='toast-content'><span class='fa fa-check-circle' style='color:#55efc4;'></span>&nbsp;&nbsp;{{message}}<span>")</script>
+    {% endfor %}
+{% endif %}
 {% endblock %}

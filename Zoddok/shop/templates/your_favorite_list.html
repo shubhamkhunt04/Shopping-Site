@@ -15,7 +15,7 @@
 {% block title_tag %}Favorites{% endblock %}
 
 {% block custom_css_and_links %}
-    <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+    
 {% endblock %}
 
 {% block breadcrum %}
@@ -70,4 +70,19 @@
 
 {% endblock %}
 
-{% block scripts %}{% endblock %}
+{% block scripts %}
+<script>
+    var toasted = new Toasted({
+        position : 'bottom-center',
+        theme : 'primary',
+        duration:5000,
+        className:'toastClass',
+        fullWidth:true,
+    })
+</script>
+{% if messages %}
+    {% for message in messages %}
+            <script>toasted.show("<span class='toast-content'><span class='fa fa-check-circle' style='color:#55efc4;'></span>&nbsp;&nbsp;{{message}}<span>")</script>
+    {% endfor %}
+{% endif %}
+{% endblock %}

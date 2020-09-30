@@ -14,18 +14,7 @@
 {% block title_tag %}Accounts{% endblock %}
 
 {% block custom_css_and_links %}
-  <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
-  <style>
-    .showPassword{
-      margin-top:6px;
-    }
-    .error,.success{
-      font-size:15px;
-    }
-    .success{
-      color:green;
-    }
-  </style>
+
 {% endblock %}
 
 {% block breadcrum %}
@@ -84,7 +73,7 @@
           <div class="passtrengthMeter login_pass">
             <input type="password" id="password" name="password" placeholder="Enter your password*" onfocus="this.placeholder=''" onblur="this.placeholder = 'Enter your password*'"  class="common-input mt-20">
             <a href=""><span class="showPassword">
-              <img src="{% static '/img/eye.svg' %}">
+              <img src="/media/img/eye.svg">
             </span></a>
           </div>
           {% endif %}
@@ -153,7 +142,7 @@
               <div class="passtrengthMeter pass">
                 <input type="password" name="password1" class="common-input" required="" id="id_password1">
                 <a href=""><span class="showPassword">
-                  <img src="{% static '/img/eye.svg' %}">
+                  <img src="/media/img/eye.svg">
                 </span></a>
               </div>
               {% endifequal %}
@@ -161,7 +150,7 @@
                 <div class="passtrengthMeter re_pass">
                   <input type="password" name="password2" class="common-input" required="" id="id_password2">
                   <a href=""><span class="showPassword">
-                    <img src="{% static '/img/eye.svg' %}">
+                    <img src="/media/img/eye.svg">
                   </span></a>
                 </div>
               {% endifequal %}

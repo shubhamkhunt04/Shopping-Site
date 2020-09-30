@@ -3,5 +3,5 @@
 {% load env_extras %}
 
 {% for node in category %}
-    <a class="dropdown-item" href="{{node.get_absolute_url}}">{{node.title}}</a>
+    <option value="{{node.slug}}">{{node.title}}</option>
 {% endfor %}
